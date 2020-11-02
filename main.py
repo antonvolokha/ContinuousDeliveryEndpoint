@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+from threading import Thread
 
 from flask import Flask, request, jsonify
 app = Flask(__name__)
@@ -23,6 +24,11 @@ def dPrint(obj):
 def error(message):
   print(message, file=sys.stderr)
   return jsonify({'error': message})
+
+def runCommand(command: str) -> None:
+  process = subprocess.Popen(command, stdout=subprocess.PIPE)
+  output, error = process.communicate()
+  dPrint(str(output))
 
 @app.route("/pull/<name>", methods=['POST'])
 def pull(name):
@@ -47,12 +53,11 @@ def pull(name):
     return error("File not found")
 
   command = ' && '.join(list(map(lambda x: "docker-compose -f %s %s" % (path, x), СOMPOSE_ACTIONS)))
-  process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-  output, error = process.communicate()
+  runner = Thread(target=runCommand, name=name, args=(command,))
+  runner.start()
 
   return jsonify({
-    'code': 200,
-    'response': output
+    'code': 200
   })
 
 if __name__ == '__main__':
