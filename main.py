@@ -17,6 +17,9 @@ DEBUG = os.environ.get('DEBUG', True)
   'up -d',
 ]
 
+def dPrint(obj):
+  print(obj, file=sys.stderr)
+
 def error(message):
   print(message, file=sys.stderr)
   return jsonify({'error': message})
