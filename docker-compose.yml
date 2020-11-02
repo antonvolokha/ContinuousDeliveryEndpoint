@@ -1,0 +1,19 @@
+version: '3.2'
+
+services:
+  cdendpoint:
+    build: .
+    volumes:
+      - ./:/app/
+    ports:
+      - "8080:8080"
+    command: python /app/main.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "2"
+
+networks:
+  default:
+    driver: bridge
